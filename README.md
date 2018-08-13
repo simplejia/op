@@ -10,4 +10,4 @@
 ## 注意
     如果在controller里修改了路由，编译前需执行go generate
 
-![1](https://static2.xiaoniangao.cn/xnggeneral/5b7176477df6a41861fc9e04)
+![1](https://github.com/simplejia/nothing/raw/master/1.tiff)
