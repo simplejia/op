@@ -26,13 +26,14 @@ TODO:
 这套系统现在长什么样？
 1. 有账号认证，如下图：
 
-![1](https://github.com/simplejia/nothing/raw/master/1.tiff)
+![1](https://github.com/simplejia/nothing/raw/master/1.png)
 
 希望账号管理、权限认证系统是一个统一的，独立的后台账号管理服务，目前开源出去的是把这一步省掉了，大家可以根据自己的情况自行添加处理代码（filter/auth.go）
 
 2. 首页，如下图：
 
-![2](https://github.com/simplejia/nothing/raw/master/2.tiff)
+![2](https://raw.githubusercontent.com/simplejia/nothing/raw/master/2.tiff)
+https://raw.githubusercontent.com/simplejia/nothing/master/2.tiff
 
 列表里展示的是已配置的可用服务
 
