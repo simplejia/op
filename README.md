@@ -32,44 +32,43 @@ TODO:
 
 2. 首页，如下图：
 
-![2](https://raw.githubusercontent.com/simplejia/nothing/raw/master/2.tiff)
-https://raw.githubusercontent.com/simplejia/nothing/master/2.tiff
+![2](https://github.com/simplejia/nothing/raw/master/2.png)
 
 列表里展示的是已配置的可用服务
 
 3. 点击新建，进入服务配置页面，如下图：
 
-![3](https://github.com/simplejia/nothing/raw/master/3.tiff)
+![3](https://github.com/simplejia/nothing/raw/master/3.png)
 ￼
 
 4. 查看某一个配置项
 
-![4](https://github.com/simplejia/nothing/raw/master/4.tiff)
+![4](https://github.com/simplejia/nothing/raw/master/4.png)
 ￼
 
 5. 进入某一项（默认进入类型是list的action，如果没有配，就会进入类型是customer的列表）
 
-![5](https://github.com/simplejia/nothing/raw/master/5.tiff)
+![5](https://github.com/simplejia/nothing/raw/master/5.png)
 ￼
 
 如上，是因为配置了cid这个必填字段，limit和offset是可选字段，其中limit配置的默认值是20，执行后，显示如下：
 
-![6](https://github.com/simplejia/nothing/raw/master/6.tiff)
+![6](https://github.com/simplejia/nothing/raw/master/6.png)
 
 ￼
 以上是列表信息，一共返回1条数据，继续执行会把cid, limit, offset, total字段发给服务端作为输入参数
 
-![7](https://github.com/simplejia/nothing/raw/master/7.tiff)
+![7](https://github.com/simplejia/nothing/raw/master/7.png)
 
 ￼
 以上是没有配置list类型的action，进入某一项会返回类型是customer的列表（或者点击list类型的页面的“其它”进入）
 
-![8](https://github.com/simplejia/nothing/raw/master/8.tiff)
+![8](https://github.com/simplejia/nothing/raw/master/8.png)
 
 ￼
 以上是点击“更新”或“删除”进入的页面，每一项数据都可以修改，点击执行后会把以上数据post给服务端（具体执行接口是来自于update或delete类型的action配置）
 
-![9](https://github.com/simplejia/nothing/raw/master/9.tiff)
+![9](https://github.com/simplejia/nothing/raw/master/9.png)
 
 ￼
 以上是点击某一customer类型的action进入的页面，上面一部分是传给后端的输入参数，可以删除一些字段，不用传，下面一部分是执行过的历史，可以恢复记录重新执行。
@@ -88,65 +87,65 @@ https://raw.githubusercontent.com/simplejia/nothing/master/2.tiff
 
 这是一个推送服务，以下是配置项：
 
-![10](https://github.com/simplejia/nothing/raw/master/10.tiff)
+![10](https://github.com/simplejia/nothing/raw/master/10.png)
 
-![11](https://github.com/simplejia/nothing/raw/master/11.tiff)
+![11](https://github.com/simplejia/nothing/raw/master/11.png)
 ￼
 ￼
 
 这是配置项的进入页（列表页）：
 
-![12](https://github.com/simplejia/nothing/raw/master/12.tiff)
+![12](https://github.com/simplejia/nothing/raw/master/12.png)
 
-![13](https://github.com/simplejia/nothing/raw/master/13.tiff)
+![13](https://github.com/simplejia/nothing/raw/master/13.png)
 ￼
 
 ￼
 这是点击列表页的更新/删除：
 
-![14](https://github.com/simplejia/nothing/raw/master/14.tiff)
+![14](https://github.com/simplejia/nothing/raw/master/14.png)
 ￼
 
 2. 服务上线
 
 这是一个php的上线功能，以下是配置项：
 
-![15](https://github.com/simplejia/nothing/raw/master/15.tiff)
+![15](https://github.com/simplejia/nothing/raw/master/15.png)
 ￼
 
 这是配置项的进入页：
 
-![16](https://github.com/simplejia/nothing/raw/master/16.tiff)
+![16](https://github.com/simplejia/nothing/raw/master/16.png)
 ￼
 
 点击/online/trans_cmd:
 
-![17](https://github.com/simplejia/nothing/raw/master/17.tiff)
+![17](https://github.com/simplejia/nothing/raw/master/17.png)
 ￼
 
 点击/online/trans_file:
 
-![18](https://github.com/simplejia/nothing/raw/master/18.tiff)
+![18](https://github.com/simplejia/nothing/raw/master/18.png)
 ￼
 
 这是一个go服务的上线功能，以下是配置项：
 
-![19](https://github.com/simplejia/nothing/raw/master/19.tiff)
+![19](https://github.com/simplejia/nothing/raw/master/19.png)
 ￼
 
 这是配置项的进入页：
 
-![20](https://github.com/simplejia/nothing/raw/master/20.tiff)
+![20](https://github.com/simplejia/nothing/raw/master/20.png)
 
 ￼
 点击/online/trans_cmd:
 
-![21](https://github.com/simplejia/nothing/raw/master/21.tiff)
+![21](https://github.com/simplejia/nothing/raw/master/21.png)
 
 ￼
 点击/online/trans_file:
 
-![22](https://github.com/simplejia/nothing/raw/master/22.tiff)
+![22](https://github.com/simplejia/nothing/raw/master/22.png)
 ￼
 
 注：上线服务依赖：github.com/simplejia/online
@@ -156,49 +155,49 @@ online项目用于提供远程文件上传及远程执行命令功能，类似�
 
 这是一个提供数据下载的配置项：
 
-![23](https://github.com/simplejia/nothing/raw/master/23.tiff)
+![23](https://github.com/simplejia/nothing/raw/master/23.png)
 
 ￼
 注意下类型：transparent，这个类型表示后端接口返回什么数据，页面上直接展示，不做任何处理
 
 以下是配置项的进入页，点击执行后的效果：（提示有文件正在下载）
 
-![24](https://github.com/simplejia/nothing/raw/master/24.tiff)
+![24](https://github.com/simplejia/nothing/raw/master/24.png)
 ￼
 
 4. 复杂功能演示
 
 这是一个提供视频处理功能的配置项：（提供按条件过滤的功能）
 
-![25](https://github.com/simplejia/nothing/raw/master/25.tiff)
+![25](https://github.com/simplejia/nothing/raw/master/25.png)
 ￼
 
 这是配置项的进入页：
 
-![27](https://github.com/simplejia/nothing/raw/master/27.tiff)
+![27](https://github.com/simplejia/nothing/raw/master/27.png)
 ￼
 
 注意“remote_ip”这个字段，配置“数据源”是“从URL”，此ip列表是调用配置的url接口返回的结果
 
 点击“执行”后的运行结果：（部分结果如下）
 
-![28](https://github.com/simplejia/nothing/raw/master/28.tiff)
+![28](https://github.com/simplejia/nothing/raw/master/28.png)
 ￼
 
 
 这是一个提供视频处理功能的配置项：（提供更好的报表展示功能）
 
-![26](https://github.com/simplejia/nothing/raw/master/26.tiff)
+![26](https://github.com/simplejia/nothing/raw/master/26.png)
 ￼
 
 这是配置项的进入页：
 
-![29](https://github.com/simplejia/nothing/raw/master/29.tiff)
+![29](https://github.com/simplejia/nothing/raw/master/29.png)
 ￼
 
 点击“执行”后的运行结果：（部分结果如下）
 
-![30](https://github.com/simplejia/nothing/raw/master/30.tiff)
+![30](https://github.com/simplejia/nothing/raw/master/30.png)
 ￼
 
 注：此表格是调用的后端接口直接吐出来的html代码
