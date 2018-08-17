@@ -33,8 +33,19 @@ func (srv *Srv) FieldValue(field *srv_model.SrvField, value string) (ret interfa
 			ret = v
 		}
 	case srv_model.FieldKindString:
-		value = strings.Trim(value, `"`)
-		ret = value
+		if value == "" {
+			ret = ""
+		} else {
+			if strings.HasPrefix(value, `"`) && strings.HasSuffix(value, `"`) {
+				v, err := strconv.Unquote(value)
+				if err != nil {
+					return nil, err
+				}
+				ret = v
+			} else {
+				ret = value
+			}
+		}
 	case srv_model.FieldKindFloat:
 		if value == "" {
 			ret = 0.0

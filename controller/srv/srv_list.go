@@ -251,9 +251,13 @@ func (srv *Srv) SrvList(w http.ResponseWriter, r *http.Request) {
 		fields[field.Name] = field.Param
 	}
 
-	for k, v := range result {
-		s, _ := json.Marshal(v)
-		fields[k] = string(s)
+	r.ParseForm()
+	for name, vs := range r.PostForm {
+		if name == "_" {
+			continue
+		}
+
+		fields[name] = vs[0]
 	}
 
 	for k, v := range resp.Data {

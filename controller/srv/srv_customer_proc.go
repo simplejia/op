@@ -306,8 +306,8 @@ func (srv *Srv) SrvCustomerProc(w http.ResponseWriter, r *http.Request) {
 		}
 
 		r.ParseForm()
-		for k, v := range r.PostForm {
-			fields[k] = v[0]
+		for k, vs := range r.PostForm {
+			fields[k] = vs[0]
 		}
 
 		historyModel := model.NewHistory()
@@ -395,18 +395,21 @@ func (srv *Srv) SrvCustomerProc(w http.ResponseWriter, r *http.Request) {
 		srv.WriteJson(w, body)
 	}
 
-	historyDetail := &history_model.HistoryDetail{
-		M:  map[string]string{},
-		Ct: time.Now(),
-	}
-	for k, v := range result {
-		if fileFields[k] {
+	fields := map[string]string{}
+
+	for name, v := range result {
+		if fileFields[name] {
 			continue
 		}
+
 		s, _ := json.Marshal(v)
-		historyDetail.M[k] = string(s)
+		fields[name] = string(s)
 	}
 
+	historyDetail := &history_model.HistoryDetail{
+		M:  fields,
+		Ct: time.Now(),
+	}
 	historyModel := model.NewHistory()
 	historyModel.SrvID = id
 	historyModel.SrvActionPath = actionPath
