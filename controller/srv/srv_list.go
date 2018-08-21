@@ -57,15 +57,58 @@ var SrvListTpl = `
         border: 1px solid #DDDDDD;
         padding: 0px 10px;
     }
+    textarea{
+		width: 100%;
+		height: 40px;
+    }
 	</style>
 
     <script type="text/javascript">
+	function toggle_checkbox(obj, name) {
+		document.getElementsByName(name).forEach(function(e){
+			e.checked = obj.checked;
+		})
+	}
     </script>
 </head>
 <body>
 	{{$id := .id}}
+	{{$select_field_params := .select_field_params}}
+	{{$multi_select_field_params := .multi_select_field_params}}
 	<a href="/">返回首页</a>
 	<a href="/srv/srv_customer_list?id={{$id}}">其它</a>
+	<form method="post" action="">
+		<input type="hidden" name="_" value="_"/>
+		<table>
+		{{range $k, $v := .fields}}
+		<tr>
+			<td>{{$k}}</td>
+			{{if ne ((index $select_field_params $k)|len) 0}}
+			<td>
+				{{range index $select_field_params $k}}
+				<input name="{{$k}}" type="radio" value="{{.Value}}" {{if eq .Value $v}}checked="checked"{{end}}/>{{.Desc}}
+				{{end}}
+			</td>	
+			{{else if ne ((index $multi_select_field_params $k)|len) 0}}
+			<td>
+				<p>
+				<input type="checkbox" onclick="toggle_checkbox(this, '{{$k}}');" />*
+				</p>
+				{{range index $multi_select_field_params $k}}
+				<input name="{{$k}}" type="checkbox" value="{{.Value}}" {{if (is_a_in_b .Value $v)}}checked="checked"{{end}}/>{{.Desc}}
+				{{end}}
+			</td>	
+			{{else}}
+			<td>
+				<textarea name="{{$k}}">{{$v}}</textarea>
+			</td>
+			{{end}}
+		</tr>
+		{{end}}
+		</table>
+		<button style="" type="submit">执行</button>
+	</form>
+	{{with .list}}
 	<table>
 	<thead>
 	<tr>
@@ -75,8 +118,7 @@ var SrvListTpl = `
 	</tr>
 	</thead>
 	<tbody>
-	{{if .list}}
-	{{range $pos, $elem := .list}}
+	{{range $pos, $elem := .}}
 	<tr>
 	<form method="post" action="">
 		<td>{{$pos}}</td>
@@ -92,20 +134,9 @@ var SrvListTpl = `
 	</form>
 	</tr>
 	{{end}}
-	{{end}}
 	</tbody>
 	</table>
-	<form method="post" action="">
-		<input type="hidden" name="_" value="_"/>
-		<table>
-		<tr>
-			{{range $k, $v := .fields}}
-			<td>{{$k}}: <input style="width: 50px;" name="{{$k}}" value="{{$v}}"/></td>
-			{{end}}
-		</tr>
-		</table>
-		<button style="" type="submit">执行</button>
-	</form>
+	{{end}}
 </body>
 </html>
 `
@@ -140,12 +171,68 @@ func (srv *Srv) SrvList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	selectFieldParams := make(map[string][]*FieldValueDesc)
+	multiSelectFieldParams := make(map[string][]*FieldValueDesc)
+	for _, field := range srvActionField.Fields {
+		if field.Source == srv_model.FieldSourceArray {
+			options, err := ParseFieldParam(field.Param)
+			if err != nil {
+				detail := fmt.Sprintf("%s field err: %v, req: %v", fun, err, field.Param)
+				clog.Error(detail)
+				srv.ReplyFailWithDetail(w, lib.CodePara, detail)
+				return
+			}
+			if field.Kind == srv_model.FieldKindArray {
+				multiSelectFieldParams[field.Name] = options
+			} else {
+				selectFieldParams[field.Name] = options
+			}
+		} else if field.Source == srv_model.FieldSourceUrl {
+			path := field.Param
+			body, err := lib.PostProxy(srvModel.Addr, path, nil)
+			if err != nil {
+				detail := fmt.Sprintf("%s get field param post err: %v, req: %v", fun, err, path)
+				clog.Error(detail)
+				srv.ReplyFailWithDetail(w, lib.CodePara, detail)
+				return
+			}
+
+			resp := &struct {
+				lib.Resp
+				Data struct {
+					List json.RawMessage
+				} `json:"data"`
+			}{}
+			if err := json.Unmarshal([]byte(body), &resp); err != nil || resp.Ret != lib.CodeOk {
+				detail := fmt.Sprintf("%s get field post response err: %v, req: %v, resp: %s", fun, err, path, body)
+				clog.Error(detail)
+				srv.ReplyFailWithDetail(w, lib.CodePara, detail)
+				return
+			}
+
+			options, err := ParseFieldParam(string(resp.Data.List))
+			if err != nil {
+				detail := fmt.Sprintf("%s field err: %v, req: %v", fun, err, field.Param)
+				clog.Error(detail)
+				srv.ReplyFailWithDetail(w, lib.CodePara, detail)
+				return
+			}
+
+			if field.Kind == srv_model.FieldKindArray {
+				multiSelectFieldParams[field.Name] = options
+			} else {
+				selectFieldParams[field.Name] = options
+			}
+		}
+	}
+
 	result := map[string]interface{}{}
 
 	if r.PostFormValue("_") == "" {
 		needSupply := false
 		for _, field := range srvActionField.Fields {
-			if field.Required && field.Param == "" {
+			if field.Required &&
+				(field.Source != srv_model.FieldSourceUser || field.Param == "") {
 				needSupply = true
 				break
 			}
@@ -154,16 +241,23 @@ func (srv *Srv) SrvList(w http.ResponseWriter, r *http.Request) {
 		if needSupply {
 			fields := map[string]string{}
 			for _, field := range srvActionField.Fields {
-				fields[field.Name] = field.Param
+				if field.Source == srv_model.FieldSourceUser {
+					fields[field.Name] = field.Param
+				} else {
+					fields[field.Name] = ""
+				}
 			}
 
 			data := map[string]interface{}{
-				"id":     id,
-				"fields": fields,
+				"id":                        id,
+				"fields":                    fields,
+				"select_field_params":       selectFieldParams,
+				"multi_select_field_params": multiSelectFieldParams,
 			}
 
 			funcMap := template.FuncMap{
-				"truncate": lib.TruncateWithSuffix,
+				"truncate":  lib.TruncateWithSuffix,
+				"is_a_in_b": IsAInB,
 			}
 			tpl := template.Must(template.New("srv_list").Funcs(funcMap).Parse(SrvListTpl))
 			if err := tpl.Execute(w, data); err != nil {
@@ -251,13 +345,9 @@ func (srv *Srv) SrvList(w http.ResponseWriter, r *http.Request) {
 		fields[field.Name] = field.Param
 	}
 
-	r.ParseForm()
-	for name, vs := range r.PostForm {
-		if name == "_" {
-			continue
-		}
-
-		fields[name] = vs[0]
+	for name, v := range result {
+		s, _ := json.Marshal(v)
+		fields[name] = string(s)
 	}
 
 	for k, v := range resp.Data {
@@ -269,13 +359,16 @@ func (srv *Srv) SrvList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := map[string]interface{}{
-		"id":     id,
-		"list":   list,
-		"fields": fields,
+		"id":                        id,
+		"list":                      list,
+		"fields":                    fields,
+		"select_field_params":       selectFieldParams,
+		"multi_select_field_params": multiSelectFieldParams,
 	}
 
 	funcMap := template.FuncMap{
-		"truncate": lib.TruncateWithSuffix,
+		"truncate":  lib.TruncateWithSuffix,
+		"is_a_in_b": IsAInB,
 	}
 	tpl := template.Must(template.New("srv_list").Funcs(funcMap).Parse(SrvListTpl))
 	if err := tpl.Execute(w, data); err != nil {

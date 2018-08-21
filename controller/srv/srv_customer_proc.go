@@ -120,7 +120,6 @@ var SrvCustomerProcTpl = `
 	{{$id := .id}}
 	{{$action_path := .action_path}}
 	{{$file_fields := .file_fields}}
-	{{$select_fields := .select_fields}}
 	{{$select_field_params := .select_field_params}}
 	{{$multi_select_field_params := .multi_select_field_params}}
 	<a href="/">返回首页</a>
@@ -168,12 +167,12 @@ var SrvCustomerProcTpl = `
 		</table>
 		<button type="submit" onclick="javascript:return confirm('确认吗?')">执行</button>
 	</form>
-	{{if .history_details}}
+	{{with .history_details}}
 	<table>
 	<tr>
 	<th>参数</th><th>时间</th><th>操作</th>
 	</tr>
-	{{range $pos, $elem := .history_details}}
+	{{range $pos, $elem := .}}
 	<tr>
 		<form method="post" action="">
 		<td>

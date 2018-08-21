@@ -68,13 +68,13 @@ var SrvCustomerListTpl = `
 <body>
 	{{$id := .id}}
 	<a href="/">返回首页</a>
-	{{if .actions}}
+	{{with .actions}}
 	<table>
 	<thead>
 		<th>PATH</th><th>描述</th>
 	</thead>
 	<tbody>
-	{{range .actions}}
+	{{range .}}
 	<tr>
 		<td><button onclick="javascript:window.location.href='/srv/srv_customer_proc?id={{$id}}&action_path={{.Path}}'">{{.Path}}</button></td>
 		<td>{{.Desc}}</td>
