@@ -226,73 +226,43 @@ func (srv *Srv) SrvList(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	result := map[string]interface{}{}
-
 	if r.PostFormValue("_") == "" {
-		needSupply := false
+		fields := map[string]string{}
 		for _, field := range srvActionField.Fields {
-			if field.Required &&
-				(field.Source != srv_model.FieldSourceUser || field.Param == "") {
-				needSupply = true
-				break
+			if field.Source == srv_model.FieldSourceUser {
+				fields[field.Name] = field.Param
+			} else {
+				fields[field.Name] = ""
 			}
 		}
 
-		if needSupply {
-			fields := map[string]string{}
-			for _, field := range srvActionField.Fields {
-				if field.Source == srv_model.FieldSourceUser {
-					fields[field.Name] = field.Param
-				} else {
-					fields[field.Name] = ""
-				}
-			}
-
-			data := map[string]interface{}{
-				"id":                        id,
-				"fields":                    fields,
-				"select_field_params":       selectFieldParams,
-				"multi_select_field_params": multiSelectFieldParams,
-			}
-
-			funcMap := template.FuncMap{
-				"truncate":  lib.TruncateWithSuffix,
-				"is_a_in_b": IsAInB,
-			}
-			tpl := template.Must(template.New("srv_list").Funcs(funcMap).Parse(SrvListTpl))
-			if err := tpl.Execute(w, data); err != nil {
-				detail := fmt.Sprintf("%s tpl err: %v", fun, err)
-				clog.Error(detail)
-				srv.ReplyFailWithDetail(w, lib.CodeSrv, detail)
-				return
-			}
-			return
+		data := map[string]interface{}{
+			"id":                        id,
+			"fields":                    fields,
+			"select_field_params":       selectFieldParams,
+			"multi_select_field_params": multiSelectFieldParams,
 		}
 
-		for _, field := range srvActionField.Fields {
-			if field.Param == "" {
-				continue
-			}
-
-			v, err := srv.FieldValue(field, field.Param)
-			if err != nil {
-				detail := fmt.Sprintf("%s field err: %v", fun, err)
-				clog.Error(detail)
-				srv.ReplyFailWithDetail(w, lib.CodePara, detail)
-				return
-			}
-			result[field.Name] = v
+		funcMap := template.FuncMap{
+			"truncate":  lib.TruncateWithSuffix,
+			"is_a_in_b": IsAInB,
 		}
-	} else {
-		_result, err := srv.FormToMap(r, srvActionField)
-		if err != nil {
-			detail := fmt.Sprintf("%s field err: %v", fun, err)
+		tpl := template.Must(template.New("srv_list").Funcs(funcMap).Parse(SrvListTpl))
+		if err := tpl.Execute(w, data); err != nil {
+			detail := fmt.Sprintf("%s tpl err: %v", fun, err)
 			clog.Error(detail)
-			srv.ReplyFailWithDetail(w, lib.CodePara, detail)
+			srv.ReplyFailWithDetail(w, lib.CodeSrv, detail)
 			return
 		}
+		return
+	}
 
-		result = _result
+	result, err := srv.FormToMap(r, srvActionField)
+	if err != nil {
+		detail := fmt.Sprintf("%s field err: %v", fun, err)
+		clog.Error(detail)
+		srv.ReplyFailWithDetail(w, lib.CodePara, detail)
+		return
 	}
 
 	req, _ := json.Marshal(result)
