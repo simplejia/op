@@ -69,6 +69,9 @@ var SrvListTpl = `
 			e.checked = obj.checked;
 		})
 	}
+    function del_row(tr) {
+		tr.innerHTML = "";
+    }
     </script>
 </head>
 <body>
@@ -103,6 +106,7 @@ var SrvListTpl = `
 				<textarea name="{{$k}}">{{$v}}</textarea>
 			</td>
 			{{end}}
+			<td><button type="button" onclick="return del_row(this.parentElement.parentElement);">删除</button></td>
 		</tr>
 		{{end}}
 		</table>
@@ -226,35 +230,46 @@ func (srv *Srv) SrvList(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	fields := map[string]string{}
+	for _, field := range srvActionField.Fields {
+		if field.Source == srv_model.FieldSourceUser {
+			fields[field.Name] = field.Param
+		} else {
+			fields[field.Name] = ""
+		}
+	}
+
 	if r.PostFormValue("_") == "" {
-		fields := map[string]string{}
+		needSupply := false
 		for _, field := range srvActionField.Fields {
-			if field.Source == srv_model.FieldSourceUser {
-				fields[field.Name] = field.Param
-			} else {
-				fields[field.Name] = ""
+			if field.Required &&
+				(field.Source != srv_model.FieldSourceUser || field.Param == "") {
+				needSupply = true
+				break
 			}
 		}
 
-		data := map[string]interface{}{
-			"id":                        id,
-			"fields":                    fields,
-			"select_field_params":       selectFieldParams,
-			"multi_select_field_params": multiSelectFieldParams,
-		}
+		if needSupply {
+			data := map[string]interface{}{
+				"id":                        id,
+				"fields":                    fields,
+				"select_field_params":       selectFieldParams,
+				"multi_select_field_params": multiSelectFieldParams,
+			}
 
-		funcMap := template.FuncMap{
-			"truncate":  lib.TruncateWithSuffix,
-			"is_a_in_b": IsAInB,
-		}
-		tpl := template.Must(template.New("srv_list").Funcs(funcMap).Parse(SrvListTpl))
-		if err := tpl.Execute(w, data); err != nil {
-			detail := fmt.Sprintf("%s tpl err: %v", fun, err)
-			clog.Error(detail)
-			srv.ReplyFailWithDetail(w, lib.CodeSrv, detail)
+			funcMap := template.FuncMap{
+				"truncate":  lib.TruncateWithSuffix,
+				"is_a_in_b": IsAInB,
+			}
+			tpl := template.Must(template.New("srv_list").Funcs(funcMap).Parse(SrvListTpl))
+			if err := tpl.Execute(w, data); err != nil {
+				detail := fmt.Sprintf("%s tpl err: %v", fun, err)
+				clog.Error(detail)
+				srv.ReplyFailWithDetail(w, lib.CodeSrv, detail)
+				return
+			}
 			return
 		}
-		return
 	}
 
 	result, err := srv.FormToMap(r, srvActionField)
@@ -291,28 +306,25 @@ func (srv *Srv) SrvList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respDataList := []map[string]json.RawMessage{}
-	if err := json.Unmarshal(resp.Data["list"], &respDataList); err != nil {
-		detail := fmt.Sprintf("%s list element not found in resp data, err: %v, req: %s", fun, err, body)
-		clog.Error(detail)
-		srv.ReplyFailWithDetail(w, lib.CodeSrv, detail)
-		return
-	}
-
 	list := []map[string]interface{}{}
 
-	for _, srcElem := range respDataList {
-		dstElem := map[string]interface{}{}
-		for k, srcV := range srcElem {
-			dstElem[k] = string(srcV)
+	if l := resp.Data["list"]; len(l) > 0 {
+		respDataList := []map[string]json.RawMessage{}
+		if err := json.Unmarshal(l, &respDataList); err != nil {
+			detail := fmt.Sprintf("%s list element not found in resp data, err: %v, req: %s", fun, err, body)
+			clog.Error(detail)
+			srv.ReplyFailWithDetail(w, lib.CodeSrv, detail)
+			return
 		}
 
-		list = append(list, dstElem)
-	}
+		for _, srcElem := range respDataList {
+			dstElem := map[string]interface{}{}
+			for k, srcV := range srcElem {
+				dstElem[k] = string(srcV)
+			}
 
-	fields := map[string]string{}
-	for _, field := range srvActionField.Fields {
-		fields[field.Name] = field.Param
+			list = append(list, dstElem)
+		}
 	}
 
 	for name, v := range result {

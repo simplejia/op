@@ -114,12 +114,7 @@ func (srv *Srv) FormToMap(r *http.Request, srvActionField *srv_model.SrvActionFi
 
 	fields := map[string]*srv_model.SrvField{}
 	for _, field := range srvActionField.Fields {
-		name := field.Name
-		if field.Required && r.PostFormValue(name) == "" {
-			err = fmt.Errorf("%s must supply", name)
-			return
-		}
-		fields[name] = field
+		fields[field.Name] = field
 	}
 
 	for name, vs := range r.PostForm {
@@ -163,6 +158,30 @@ func (srv *Srv) FormToMap(r *http.Request, srvActionField *srv_model.SrvActionFi
 		}
 
 		result[name] = ret
+	}
+
+	for _, field := range srvActionField.Fields {
+		name := field.Name
+		if r.PostFormValue(name) != "" {
+			continue
+		}
+
+		param := field.Param
+		if field.Required &&
+			(field.Source != srv_model.FieldSourceUser || param == "") {
+			err = fmt.Errorf("%s must supply", name)
+			return nil, err
+		}
+
+		if field.Source != srv_model.FieldSourceUser {
+			continue
+		}
+
+		v, err := srv.FieldValue(field, param)
+		if err != nil {
+			return nil, err
+		}
+		result[name] = v
 	}
 
 	return
