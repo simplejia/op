@@ -362,7 +362,7 @@ func (srv *Srv) SrvCustomerProc(w http.ResponseWriter, r *http.Request) {
 
 	var body []byte
 	if srvActionField.Action.Kind == srv_model.ActionKindTransparent {
-		req, err := json.Marshal(result)
+		req, _ := json.Marshal(result)
 		_body, header, err := lib.PostProxyReturnHeader(srvModel.Addr, srvActionField.Action.Path, req)
 		if err != nil {
 			detail := fmt.Sprintf("%s post err: %v", fun, err)
@@ -377,7 +377,7 @@ func (srv *Srv) SrvCustomerProc(w http.ResponseWriter, r *http.Request) {
 		}
 		body = _body
 	} else {
-		req, err := json.Marshal(result)
+		req, _ := json.Marshal(result)
 		_body, err := lib.PostProxy(srvModel.Addr, srvActionField.Action.Path, req)
 		if err != nil {
 			detail := fmt.Sprintf("%s post err: %v", fun, err)
