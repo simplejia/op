@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
+	mgo "github.com/globalsign/mgo"
 	"github.com/simplejia/op/mongo"
-	mgo "gopkg.in/mgo.v2"
 )
 
 type FieldKind int

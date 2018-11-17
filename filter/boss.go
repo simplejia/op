@@ -7,7 +7,7 @@ import (
 
 	"lib"
 
-	"github.com/simplejia/clog"
+	"github.com/simplejia/clog/api"
 )
 
 // Boss 后置过滤器，用于数据上报，比如调用延时，出错等

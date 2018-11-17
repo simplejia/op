@@ -6,7 +6,7 @@ import (
 
 	"github.com/simplejia/utils"
 
-	"github.com/simplejia/clog"
+	"github.com/simplejia/clog/api"
 
 	"lib"
 

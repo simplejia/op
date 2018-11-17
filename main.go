@@ -11,7 +11,7 @@ import (
 	"lib"
 	"net/http"
 
-	"github.com/simplejia/clog"
+	"github.com/simplejia/clog/api"
 	"github.com/simplejia/utils"
 
 	"github.com/simplejia/op/conf"

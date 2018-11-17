@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/simplejia/clog"
+	"github.com/simplejia/clog/api"
 
 	"lib"
 

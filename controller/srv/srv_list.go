@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/simplejia/clog"
+	"github.com/simplejia/clog/api"
 
 	"lib"
 

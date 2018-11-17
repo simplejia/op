@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/simplejia/clog"
+	"github.com/simplejia/clog/api"
 )
 
 const (

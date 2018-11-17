@@ -3,7 +3,7 @@ package srv
 import (
 	"time"
 
-	mgo "gopkg.in/mgo.v2"
+	mgo "github.com/globalsign/mgo"
 )
 
 func (srv *Srv) Add() (err error) {

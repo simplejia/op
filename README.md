@@ -208,7 +208,7 @@ online项目用于提供远程文件上传及远程执行命令功能，类似�
     clog: github.com/simplejia/clog
     utils: github.com/simplejia/utils
     namecli: github.com/simplejia/namecli
-    mongo: gopkg.in/mgo.v2
+    mongo: github.com/globalsign/mgo
 
 ## 注意
 > 如果在controller里修改了路由，编译前需执行go generate，实际是运行了wsp这个工具，所以需要提前go get github.com/simplejia/wsp
